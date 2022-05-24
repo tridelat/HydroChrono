@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdio>
 
 #include "chrono/solver/ChSolverPMINRES.h"
@@ -22,6 +23,7 @@
 using namespace chrono;
 using namespace chrono::irrlicht;
 using namespace chrono::fea;
+//using chrono::ChMatrixDynamic; //TODO: change using namespaces above to this stuff (better practice)
 
 // =============================================================================
 class H5FileInfo {

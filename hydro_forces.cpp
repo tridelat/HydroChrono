@@ -503,8 +503,8 @@ HydroForces::HydroForces(H5FileInfo& h5_file_info, std::shared_ptr<ChBody> objec
 	hydro_inputs = user_hydro_inputs;
 	// define wave inputs here
 	// TODO: switch depending on wave option (regular, regularCIC, irregular, noWaveCIC)
-	wave_amplitude = hydro_inputs.regular_wave_amplitude;
-	wave_omega = hydro_inputs.regular_wave_omega;
+	wave_amplitude = hydro_inputs.GetRegularWaveAmplitude();
+	wave_omega = hydro_inputs.GetRegularWaveOmega();
 	wave_omega_delta = file_info.GetOmegaDelta();
 	freq_index_des = (wave_omega / wave_omega_delta) - 1;
 
@@ -572,7 +572,7 @@ ChVectorN<double, 6> HydroForces::ComputeForceRadiationDampingConv() {
 	int size = file_info.GetRIRFDims(2);
 	// "shift" everything left 1
 	offset--;
-	if (offset < -1 * size) {
+	if (offset < -1 * size) { // not super necessary, just to avoid negative overflow errors
 		offset += size;
 	}
 	int numRows = 6, numCols = 6;
@@ -590,7 +590,7 @@ ChVectorN<double, 6> HydroForces::ComputeForceRadiationDampingConv() {
 	//#pragma omp parallel for
 	for (int row = 0; row < 6; row++) {
 		force_radiation_damping[row] = 0.0;
-		double fDampingCol = 0.0;
+		double fDampingCol = 0.0; //what is this? not needed?
 		//#pragma omp parallel for
 		for (int col = 0; col < 6; col++) {
 			for (int st = 0; st < size; st++) {
@@ -706,7 +706,7 @@ void ChLoadAddedMass::ComputeJacobian(ChState* state_x,       ///< state positio
 ) {
 	//set mass matrix here
 
-	jacobians->M = inf_added_mass_J;
+	jacobians->M = inf_added_mass_J; // inf_added_mass_J read in from h5 file
 
 	ChMatrixDynamic<double> massmat = jacobians->M;
 

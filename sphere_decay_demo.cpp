@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	while (application.GetDevice()->run() && system.GetChTime() <= 40) {
 		application.BeginScene();
 		application.DrawAll();
-		/*if (buttonPressed)*/if(true) {
+		if (buttonPressed)/*if(true)*/ {
 			zpos << system.GetChTime() << "\t" << body->GetPos().z() << "\t" << body->GetPos_dt().z() << "\t" << body->GetAppliedForce().z() << "\n";
 			application.DoStep();
 			frame++;

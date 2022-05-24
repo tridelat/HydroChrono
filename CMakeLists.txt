@@ -5,6 +5,7 @@
 #--------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.18.2)
+set (CMAKE_CXX_STANDARD 17)
 
 #--------------------------------------------------------------
 # Modify the project name if you want: 
@@ -124,3 +125,6 @@ target_link_libraries(rm3_demo HydroChrono)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 add_DLL_copy_command("${CHRONO_DLLS}")
+# Back to parent CMakeLists for chrono
+add_subdirectory(swig)
+
