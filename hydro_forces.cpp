@@ -752,6 +752,9 @@ void ChLoadAddedMass::LoadIntLoadResidual_Mv(ChVectorDynamic<>& R, const ChVecto
 /*******************************************************************************
 *
 *******************************************************************************/
+void testfunctionforswigandpython () { 
+	std::cout << "this is a test\n"; 
+}
 LoadAllHydroForces::LoadAllHydroForces(std::shared_ptr<ChBody> object, std::string file, std::string bodyName, HydroInputs user_hydro_inputs) :
 	sys_file_info(file, bodyName), hydro_force(sys_file_info, object, user_hydro_inputs) {
 

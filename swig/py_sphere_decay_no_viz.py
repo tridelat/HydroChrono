@@ -18,7 +18,7 @@ body.SetMass(261.8e3)
 body.SetPos(chrono.ChVectorD(0, 0, -1))
 system.AddBody(body)
 
-_py_hydrochrono.testfunction()
+_py_hydrochrono.testfunctionforswigandpython()
 
 # visualization
 # application = chronoirr.ChIrrApp(system, "sphere-testing", chronoirr.dimension2du(400, 300))

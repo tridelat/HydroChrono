@@ -194,11 +194,11 @@ private:
 	virtual bool IsStiff() override { return true; } // this to force the use of the inertial M, R and K matrices
 
 };
+void testfunctionforswigandpython();
 // =============================================================================
 class LoadAllHydroForces {
 public:
 	LoadAllHydroForces(std::shared_ptr<ChBody> object, std::string file, std::string body_name, HydroInputs users_hydro_inputs);
-	//void testfunctionforswigandpython() { std::cout << "this is a test\n"; }
 
 private:
 	H5FileInfo sys_file_info;

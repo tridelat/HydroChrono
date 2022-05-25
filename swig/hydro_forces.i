@@ -4,7 +4,8 @@
  #include "hydro_forces.h"
  %}
    
- 
+ void testfunctionforswigandpython();
+
  // Parse the original header file
 class LoadAllHydroForces {
 public:
