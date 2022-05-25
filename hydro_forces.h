@@ -25,6 +25,7 @@ using namespace chrono::irrlicht;
 using namespace chrono::fea;
 //using chrono::ChMatrixDynamic; //TODO: change using namespaces above to this stuff (better practice)
 
+
 // =============================================================================
 class H5FileInfo {
 public:
@@ -197,6 +198,8 @@ private:
 class LoadAllHydroForces {
 public:
 	LoadAllHydroForces(std::shared_ptr<ChBody> object, std::string file, std::string body_name, HydroInputs users_hydro_inputs);
+	//void testfunctionforswigandpython() { std::cout << "this is a test\n"; }
+
 private:
 	H5FileInfo sys_file_info;
 	HydroForces hydro_force;

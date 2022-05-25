@@ -1,8 +1,8 @@
 import sys
 import math
 import pychrono as chrono
-#import pychrono.irrlicht as chronoirr
-import hydrochrono_py
+import pychrono.irrlicht as chronoirr
+import _py_hydrochrono
 
 # create the system
 system = chrono.ChSystemNSC()
@@ -18,6 +18,7 @@ body.SetMass(261.8e3)
 body.SetPos(chrono.ChVectorD(0, 0, -1))
 system.AddBody(body)
 
+_py_hydrochrono.testfunction()
 
 # visualization
 # application = chronoirr.ChIrrApp(system, "sphere-testing", chronoirr.dimension2du(400, 300))

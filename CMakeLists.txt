@@ -19,16 +19,11 @@ string(TOLOWER ${LIB_TYPE} SEARCH_TYPE)
 
 find_package(Chrono COMPONENTS Irrlicht CONFIG)
 find_package(HDF5 NAMES hdf5 COMPONENTS CXX ${SEARCH_TYPE})
-#find_package(SWIG REQUIRED)
-#find_package(PythonLibs)
-#include(${SWIG_USE_FILE})
 
 include_directories(${HDF5_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} ${CHRONO_INCLUDE_DIRS})
-#include_directories(${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR} ${CHRONO_INCLUDE_DIRS})
 
 set(PROJECT_LIBS ${HDF5_LIBS} ${HDF5_LIBRARIES})
 set (LINK_LIBS ${LINK_LIBS} ${CHRONO_LIBRARIES} ${HDF5_CXX_${LIB_TYPE}_LIBRARY})
-#SET(CMAKE_SWIG_FLAGS "")
 
 #-----------------------------------------------------------------------------
 # Fix for VS 2017 15.8 and newer to handle alignment specification with Eigen
@@ -64,7 +59,6 @@ add_executable(sphere_decay_demo "sphere_decay_demo.cpp")
 add_executable(sphere_decay_no_viz "sphere_decay_no_viz.cpp")
 add_executable(sphere_reg_waves_no_viz "sphere_reg_waves_no_viz.cpp")
 add_executable(rm3_demo "rm3_demo.cpp")
-#SWIG_ADD_LIBRARY(py_wec_chrono LANGUAGE python SOURCES hydro_forces_no_viz.i)
 
 
 #--------------------------------------------------------------
@@ -110,7 +104,6 @@ target_link_libraries(sphere_decay_no_viz HydroChrono)
 target_link_libraries(sphere_decay_demo HydroChrono)
 target_link_libraries(sphere_reg_waves_no_viz HydroChrono)
 target_link_libraries(rm3_demo HydroChrono)
-#SWIG_LINK_LIBRARIES(py_wec_chrono wec_chrono ${PYTHON_LIBRARIES})
 
 #--------------------------------------------------------------
 # === 4 (OPTIONAL) ===
@@ -125,6 +118,5 @@ target_link_libraries(rm3_demo HydroChrono)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 add_DLL_copy_command("${CHRONO_DLLS}")
-# Back to parent CMakeLists for chrono
 add_subdirectory(swig)
 
