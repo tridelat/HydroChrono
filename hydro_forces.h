@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdio>
 
 #include "chrono/solver/ChSolverPMINRES.h"
 #include "chrono/solver/ChIterativeSolverLS.h"
@@ -194,7 +193,7 @@ private:
 	virtual bool IsStiff() override { return true; } // this to force the use of the inertial M, R and K matrices
 
 };
-void testfunctionforswigandpython();
+void testfunctionforswigandpython(ChBody blah);
 // =============================================================================
 class LoadAllHydroForces {
 public:

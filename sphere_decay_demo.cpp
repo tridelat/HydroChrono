@@ -1,4 +1,5 @@
 #include "hydro_forces.h"
+#include <cstdio>
 #include "chrono_irrlicht/ChIrrNodeAsset.h"
 #include <chrono>
 

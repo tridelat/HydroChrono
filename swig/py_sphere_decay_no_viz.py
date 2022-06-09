@@ -18,7 +18,7 @@ body.SetMass(261.8e3)
 body.SetPos(chrono.ChVectorD(0, 0, -1))
 system.AddBody(body)
 
-_py_hydrochrono.testfunctionforswigandpython()
+_py_hydrochrono.testfunctionforswigandpython(body)
 
 # visualization
 # application = chronoirr.ChIrrApp(system, "sphere-testing", chronoirr.dimension2du(400, 300))
@@ -28,8 +28,8 @@ _py_hydrochrono.testfunctionforswigandpython()
 # application.AssetBindAll()
 # application.AssetUpdateAll()
 
-test = HydroInputs()
-test.SetRegularWaveAmplitude(5)
+# test = HydroInputs()
+# test.SetRegularWaveAmplitude(5)
 # x = _py_wec_chrono.new_LoadAllHydroForces(body, str("sphere.h5"))
 # blah = pyexample.TestClass()
 
