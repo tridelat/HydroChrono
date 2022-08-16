@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <numeric> // std::accumulate
 
+
 // =============================================================================
 // H5FileInfo Class Definitions
 // =============================================================================
@@ -16,51 +17,51 @@ H5FileInfo::H5FileInfo() {}
 * each body in system should have its own H5FileInfo object
 * calls readH5Data()
 *******************************************************************************/
-H5FileInfo::H5FileInfo(std::string file, std::string Name) {
-	h5_file_name = file;
-	bodyName = Name;
-	std::cout << "searching for file: " << file << std::endl;
-	if (std::filesystem::exists(file)) {
-		std::cout << "found file at: " << std::filesystem::absolute(file) << std::endl;
-	}
-	else {
-		std::cout << "h5 file does not exist, absolute file location: " << std::filesystem::absolute(file) << std::endl;
-	}
-	readH5Data();
-}
+//H5FileInfo::H5FileInfo(std::string file, std::string Name) {
+//	h5_file_name = file;
+//	bodyName = Name;
+//	std::cout << "searching for file: " << file << std::endl;
+//	if (std::filesystem::exists(file)) {
+//		std::cout << "found file at: " << std::filesystem::absolute(file) << std::endl;
+//	}
+//	else {
+//		std::cout << "h5 file does not exist, absolute file location: " << std::filesystem::absolute(file) << std::endl;
+//	}
+//	readH5Data();
+//}
 
 /*******************************************************************************
 * H5FileInfo::readH5Data()
 * private member function called from constructor
 * calls Initialize functions to read h5 file information into  member variables
 *******************************************************************************/
-void H5FileInfo::readH5Data() { // TODO break up this function!
-	// open file with read only access
-	H5::H5File sphereFile(h5_file_name, H5F_ACC_RDONLY);
-
-	InitScalar(sphereFile, "simulation_parameters/rho", _rho);
-	InitScalar(sphereFile, "simulation_parameters/g", _g);
-	InitScalar(sphereFile, bodyName + "/properties/disp_vol", _disp_vol);
-	Init1D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
-	Init1D(sphereFile, bodyName + "/properties/cb", cb);
-	Init1D(sphereFile, bodyName + "/properties/cg", cg);
-	Init1D(sphereFile, "simulation_parameters/w", freq_list);
-
-	Init2D(sphereFile, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
-	Init2D(sphereFile, bodyName + "/hydro_coeffs/added_mass/inf_freq", inf_added_mass);
-
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
-	// use same scalar function to set the int valued body number
-	double temp;
-	InitScalar(sphereFile, bodyName + "/properties/body_number", temp);
-	bodyNum = (int)temp;
-
-	sphereFile.close();
-}
+//void H5FileInfo::readH5Data() { // TODO break up this function!
+//	// open file with read only access
+//	H5::H5File sphereFile(h5_file_name, H5F_ACC_RDONLY);
+//
+//	InitScalar(sphereFile, "simulation_parameters/rho", _rho);
+//	InitScalar(sphereFile, "simulation_parameters/g", _g);
+//	InitScalar(sphereFile, bodyName + "/properties/disp_vol", _disp_vol);
+//	Init1D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
+//	Init1D(sphereFile, bodyName + "/properties/cb", cb);
+//	Init1D(sphereFile, bodyName + "/properties/cg", cg);
+//	Init1D(sphereFile, "simulation_parameters/w", freq_list);
+//
+//	Init2D(sphereFile, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
+//	Init2D(sphereFile, bodyName + "/hydro_coeffs/added_mass/inf_freq", inf_added_mass);
+//
+//	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
+//	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
+//	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims);
+//	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
+//	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
+//	// use same scalar function to set the int valued body number
+//	double temp;
+//	InitScalar(sphereFile, bodyName + "/properties/body_number", temp);
+//	bodyNum = (int)temp;
+//
+//	sphereFile.close();
+//}
 
 /*******************************************************************************
 * H5FileInfo::InitScalar(file, data_name, var)
@@ -69,18 +70,18 @@ void H5FileInfo::readH5Data() { // TODO break up this function!
 * var - member variable to store the information in data_name in
 * Reads a double type variable from data_name DataSet in file, stores it in var
 *******************************************************************************/
-void H5FileInfo::InitScalar(H5::H5File& file, std::string data_name, double& var) {
-	H5::DataSet dataset = file.openDataSet(data_name);
-	H5::DataSpace filespace = dataset.getSpace();
-	hsize_t dims[2] = { 0,0 };
-	int rank = filespace.getSimpleExtentDims(dims);
-	H5::DataSpace mspace1 = H5::DataSpace(rank, dims);
-	double* temp = new double[dims[0] * dims[1]];
-	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
-	var = temp[0];
-	dataset.close();
-	delete[] temp;
-}
+//void H5FileInfo::InitScalar(H5::H5File& file, std::string data_name, double& var) {
+//	H5::DataSet dataset = file.openDataSet(data_name);
+//	H5::DataSpace filespace = dataset.getSpace();
+//	hsize_t dims[2] = { 0,0 };
+//	int rank = filespace.getSimpleExtentDims(dims);
+//	H5::DataSpace mspace1 = H5::DataSpace(rank, dims);
+//	double* temp = new double[dims[0] * dims[1]];
+//	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+//	var = temp[0];
+//	dataset.close();
+//	delete[] temp;
+//}
 
 /*******************************************************************************
 * H5FileInfo::Init1D(file, data_name, var)
@@ -89,27 +90,27 @@ void H5FileInfo::InitScalar(H5::H5File& file, std::string data_name, double& var
 * var - member variable to store the information in data_name in
 * Reads a 1D double type variable from data_name DataSet in file, stores it in var
 *******************************************************************************/
-void H5FileInfo::Init1D(H5::H5File& file, std::string data_name, std::vector<double>& var) {
-	// open specific dataset
-	H5::DataSet dataset = file.openDataSet(data_name);
-	// Get filespace for rank and dimension
-	H5::DataSpace filespace = dataset.getSpace();
-	// Get number of dimensions in the file dataspace
-	// Get and print the dimension sizes of the file dataspace
-	hsize_t dims[2] = { 0,0 };    // dataset dimensions
-	int rank = filespace.getSimpleExtentDims(dims);
-	// read file into data_out 2d array
-	H5::DataSpace mspace1(rank, dims);
-	double* temp = new double[dims[0] * dims[1]];
-	// read file info into current_pos
-	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
-	var.resize(dims[0] * dims[1]);
-	for (int i = 0; i < dims[0] * dims[1]; i++) {
-		var[i] = temp[i];
-	}
-	dataset.close();
-	delete[] temp;
-}
+//void H5FileInfo::Init1D(H5::H5File& file, std::string data_name, std::vector<double>& var) {
+//	// open specific dataset
+//	H5::DataSet dataset = file.openDataSet(data_name);
+//	// Get filespace for rank and dimension
+//	H5::DataSpace filespace = dataset.getSpace();
+//	// Get number of dimensions in the file dataspace
+//	// Get and print the dimension sizes of the file dataspace
+//	hsize_t dims[2] = { 0,0 };    // dataset dimensions
+//	int rank = filespace.getSimpleExtentDims(dims);
+//	// read file into data_out 2d array
+//	H5::DataSpace mspace1(rank, dims);
+//	double* temp = new double[dims[0] * dims[1]];
+//	// read file info into current_pos
+//	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+//	var.resize(dims[0] * dims[1]);
+//	for (int i = 0; i < dims[0] * dims[1]; i++) {
+//		var[i] = temp[i];
+//	}
+//	dataset.close();
+//	delete[] temp;
+//}
 
 /*******************************************************************************
 * H5FileInfo::Init2D(file, data_name, var)
@@ -118,28 +119,28 @@ void H5FileInfo::Init1D(H5::H5File& file, std::string data_name, std::vector<dou
 * var - member variable to store the information in data_name in
 * Reads a 2D double type variable from data_name DataSet in file, stores it in var
 *******************************************************************************/
-void H5FileInfo::Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic<double>& var) {
-	//data_name = bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K";
-	H5::DataSet dataset = file.openDataSet(data_name);
-	H5::DataSpace filespace = dataset.getSpace();
-	hsize_t dims[2] = { 0,0 };
-	int rank = filespace.getSimpleExtentDims(dims);
-	// read file into data_out 2d array
-	H5::DataSpace mspace(rank, dims);
-	// rirf_dims[0] is number of rows, rirf_dims[1] is number of columns, rirf_dims[2] is number of matrices
-	double* temp = new double[dims[0] * dims[1]];
-	// read file info into data_out, a 2d array
-	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace, filespace);
-	// set var here
-	var.resize(dims[0], dims[1]);
-	for (int i = 0; i < dims[0]; i++) {
-		for (int j = 0; j < dims[1]; j++) {
-			var(i, j) = temp[i * dims[1] + j];
-		}
-	}
-	dataset.close();
-	delete[] temp;
-}
+//void H5FileInfo::Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic<double>& var) {
+//	//data_name = bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K";
+//	H5::DataSet dataset = file.openDataSet(data_name);
+//	H5::DataSpace filespace = dataset.getSpace();
+//	hsize_t dims[2] = { 0,0 };
+//	int rank = filespace.getSimpleExtentDims(dims);
+//	// read file into data_out 2d array
+//	H5::DataSpace mspace(rank, dims);
+//	// rirf_dims[0] is number of rows, rirf_dims[1] is number of columns, rirf_dims[2] is number of matrices
+//	double* temp = new double[dims[0] * dims[1]];
+//	// read file info into data_out, a 2d array
+//	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace, filespace);
+//	// set var here
+//	var.resize(dims[0], dims[1]);
+//	for (int i = 0; i < dims[0]; i++) {
+//		for (int j = 0; j < dims[1]; j++) {
+//			var(i, j) = temp[i * dims[1] + j];
+//		}
+//	}
+//	dataset.close();
+//	delete[] temp;
+//}
 
 /*******************************************************************************
 * H5FileInfo::Init3D(file, data_name, var)
@@ -149,45 +150,45 @@ void H5FileInfo::Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic
 * d - member variable to store dimensions of 3d vectorized matrix object
 * Reads a 3D double type variable from data_name DataSet in file, stores it in var
 *******************************************************************************/
-void H5FileInfo::Init3D(H5::H5File& file, std::string data_name, std::vector<double>& var, std::vector<int>& d) {
-	// open specific dataset
-	H5::DataSet dataset = file.openDataSet(data_name);
-	// Get filespace for rank and dimension
-	H5::DataSpace filespace = dataset.getSpace();
-	hsize_t dims[3] = { 0,0,0 };
-	int rank = filespace.getSimpleExtentDims(dims);
-	// read file into data_out 2d array
-	H5::DataSpace mspace(rank, dims);
-	// rirf_dims[0] is number of rows, rirf_dims[1] is number of columns, rirf_dims[2] is number of matrices
-	double* temp = new double[dims[0] * dims[1] * dims[2]];
-	// read file info into data_out, a 2d array
-	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace, filespace);
-	// set var here
-	var.resize(dims[0] * dims[1] * dims[2]);
-	d.resize(3);
-	for (int i = 0; i < 3; i++) {
-		d[i] = dims[i];
-	}
-	for (int i = 0; i < dims[0] * dims[1] * dims[2]; i++) {
-		var[i] = temp[i];
-	}
-	dataset.close();
-	delete[] temp;
-}
+//void H5FileInfo::Init3D(H5::H5File& file, std::string data_name, std::vector<double>& var, std::vector<int>& d) {
+//	// open specific dataset
+//	H5::DataSet dataset = file.openDataSet(data_name);
+//	// Get filespace for rank and dimension
+//	H5::DataSpace filespace = dataset.getSpace();
+//	hsize_t dims[3] = { 0,0,0 };
+//	int rank = filespace.getSimpleExtentDims(dims);
+//	// read file into data_out 2d array
+//	H5::DataSpace mspace(rank, dims);
+//	// rirf_dims[0] is number of rows, rirf_dims[1] is number of columns, rirf_dims[2] is number of matrices
+//	double* temp = new double[dims[0] * dims[1] * dims[2]];
+//	// read file info into data_out, a 2d array
+//	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace, filespace);
+//	// set var here
+//	var.resize(dims[0] * dims[1] * dims[2]);
+//	d.resize(3);
+//	for (int i = 0; i < 3; i++) {
+//		d[i] = dims[i];
+//	}
+//	for (int i = 0; i < dims[0] * dims[1] * dims[2]; i++) {
+//		var[i] = temp[i];
+//	}
+//	dataset.close();
+//	delete[] temp;
+//}
 
 /*******************************************************************************
 * H5FileInfo::~H5FileInfo()
 * H5FileInfo destructor TODO
 *******************************************************************************/
-H5FileInfo::~H5FileInfo() { }
+//H5FileInfo::~H5FileInfo() { }
 
 /*******************************************************************************
 * H5FileInfo::GetInfAddedMassMatrix()
 * returns the added mass matrix at infinite frequency
 *******************************************************************************/
-ChMatrixDynamic<double> H5FileInfo::GetInfAddedMassMatrix() const {
-	return inf_added_mass * rho;
-}
+//ChMatrixDynamic<double> H5FileInfo::GetInfAddedMassMatrix() const {
+//	return inf_added_mass * rho;
+//}
 
 /*******************************************************************************
 * H5FileInfo::GetHydrostaticStiffness()
@@ -201,32 +202,32 @@ double H5FileInfo::GetHydrostaticStiffness(int i, int j) const {
 * H5FileInfo::GetRIRFval()
 * returns impulse response coeff for row m, column n, step s
 *******************************************************************************/
-double H5FileInfo::GetRIRFval(int m, int n, int s) const {
-	int index = s + rirf_dims[2] * (n + m * rirf_dims[1]);
-	if (index < 0 || index >= rirf_dims[0] * rirf_dims[1] * rirf_dims[2]) {
-		std::cout << "out of bounds IRF\n";
-		return 0;
-	}
-	else {
-		return rirf_matrix[index] * rho; // scale radiation force by rho
-	}
-}
+//double H5FileInfo::GetRIRFval(int m, int n, int s) const {
+//	int index = s + rirf_dims[2] * (n + m * rirf_dims[1]);
+//	if (index < 0 || index >= rirf_dims[0] * rirf_dims[1] * rirf_dims[2]) {
+//		std::cout << "out of bounds IRF\n";
+//		return 0;
+//	}
+//	else {
+//		return rirf_matrix[index] * rho; // scale radiation force by rho
+//	}
+//}
 
 /*******************************************************************************
 * H5FileInfo::GetRIRFDims(int i) returns the i-th component of the dimensions of radiation_damping_matrix
 * i = [0,1,2] -> [number of rows, number of columns, number of matrices]
 *******************************************************************************/
-int H5FileInfo::GetRIRFDims(int i) const {
-	return rirf_dims[i];
-}
+//int H5FileInfo::GetRIRFDims(int i) const {
+//	return rirf_dims[i];
+//}
 
 /*******************************************************************************
 * H5FileInfo::GetRIRFTimeVector()
 * returns the std::vector of rirf_time_vector from h5 file
 *******************************************************************************/
-std::vector<double> H5FileInfo::GetRIRFTimeVector() const {
-	return rirf_time_vector;
-}
+//std::vector<double> H5FileInfo::GetRIRFTimeVector() const {
+//	return rirf_time_vector;
+//}
 
 /*******************************************************************************
 * H5FileInfo::GetNumFreqs()
@@ -310,6 +311,447 @@ std::vector<double> H5FileInfo::GetRIRFTimeVector() const {
 //double H5FileInfo::GetRIRFdt() const {
 //	return rirf_time_vector[1] - rirf_time_vector[0];
 //}
+
+// =============================================================================
+// H5FileInfo Class Definitions
+// =============================================================================
+
+/*******************************************************************************
+* H5FileInfo::readH5Data()
+* private member function called from constructor
+* reads h5 file data and stores it in member variables for use with other
+* classes and forces
+*******************************************************************************/
+void H5FileInfo::readH5Data() { // TODO break up this function!
+	// open file with read only access
+	H5::H5File sphereFile(h5_file_name, H5F_ACC_RDONLY);
+
+	// Read linear restoring stiffness file info into matrices
+	std::string data_name = bodyName + "/hydro_coeffs/linear_restoring_stiffness";
+	H5::DataSet dataset = sphereFile.openDataSet(data_name);
+	// Get filespace for rank and dimension
+	H5::DataSpace filespace = dataset.getSpace();
+	// Get number of dimensions in the file dataspace
+	// Get and print the dimension sizes of the file dataspace
+	hsize_t dims[2];    // dataset dimensions
+	int rank = filespace.getSimpleExtentDims(dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspace1(rank, dims);
+	double* temp;
+	temp = new double[dims[0] * dims[1]];
+	// read file info into data_out, a 2d array
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// turn the 2d array into a ChMatrix (Eigen dynamic matrix)
+	lin_matrix.resize(dims[0], dims[1]);
+	for (int i = 0; i < dims[0]; i++) {
+		for (int j = 0; j < dims[1]; j++) {
+			lin_matrix(i, j) = temp[i * dims[1] + j];
+		}
+	}
+	dataset.close();
+	delete[] temp;
+
+	data_name = bodyName + "/hydro_coeffs/added_mass/inf_freq";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	temp = new double[dims[0] * dims[1]];
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// put into equilibrium chvector
+	infinite_added_mass.resize(dims[0], dims[1]);
+	for (int i = 0; i < dims[0]; i++) {
+		for (int j = 0; j < dims[1]; j++) {
+			infinite_added_mass(i, j) = temp[i * dims[1] + j];
+		}
+	}
+	dataset.close();
+	delete[] temp;
+
+	// repeat same steps from above to get the cb and cg...reusing some of the previous arrays etc
+	data_name = bodyName + "/properties/cb";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	temp = new double[dims[0] * dims[1]];
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// put into equilibrium chvector
+	for (int i = 0; i < dims[0]; i++) {
+		cb[i] = temp[i];
+	}
+	dataset.close();
+
+	// repeat finally for cg
+	// TODO add a helper function for the repeated reading things
+	data_name = bodyName + "/properties/cg";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// put into equilibrium chvector
+	for (int i = 0; i < dims[0]; i++) {
+		cg[i] = temp[i];
+	}
+	dataset.close();
+	delete[] temp;
+
+	// read displaced volume for buoyancy force
+	data_name = bodyName + "/properties/disp_vol";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	temp = new double[dims[0] * dims[1]];
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	disp_vol = temp[0];
+	dataset.close();
+
+	// read rho
+	data_name = "simulation_parameters/rho";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	rho = temp[0];
+	dataset.close();
+
+	// read body number (for index manipulation later in multibody system)
+	data_name = bodyName + "/properties/body_number";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	bodyNum = (int)temp[0];
+	dataset.close();
+
+	// read g
+	data_name = "simulation_parameters/g";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	g = temp[0];
+	dataset.close();
+	delete[] temp;
+	lin_matrix *= rho * g; // scale by rho*g
+
+	// read frequencies
+	data_name = "simulation_parameters/w";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(freq_dims);
+	mspace1 = H5::DataSpace(rank, freq_dims);
+	temp = new double[freq_dims[0] * freq_dims[1]];
+	freq_list.resize(freq_dims[0]);
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// put into rirf_time_vector chvector
+	for (int i = 0; i < freq_dims[0]; i++) {
+		freq_list[i] = temp[i];
+	}
+	dataset.close();
+	delete[] temp;
+
+	// read K
+	//TODO NEED new solution for this for multibody situations...
+	data_name = bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	int rank3 = filespace.getSimpleExtentDims(rirf_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspace3(rank3, rirf_dims);
+	// rirf_dims[0] is number of rows, rirf_dims[1] is number of columns, rirf_dims[2] is number of matrices
+	rirf_matrix = new double[rirf_dims[0] * rirf_dims[1] * rirf_dims[2]];
+	// read file info into data_out, a 2d array
+	dataset.read(rirf_matrix, H5::PredType::NATIVE_DOUBLE, mspace3, filespace);
+	dataset.close();
+
+	// read rirf_time_vector 1001x1 array
+	data_name = bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank = filespace.getSimpleExtentDims(dims);
+	mspace1 = H5::DataSpace(rank, dims);
+	temp = new double[dims[0] * dims[1]];
+	rirf_time_vector.resize(dims[0]); // resize std::vector for rirf time to be 1001
+	dataset.read(temp, H5::PredType::NATIVE_DOUBLE, mspace1, filespace);
+	// put into rirf_time_vector chvector
+	for (int i = 0; i < dims[0]; i++) {
+		rirf_time_vector[i] = temp[i];
+	}
+	rirf_timestep = rirf_time_vector[1] - rirf_time_vector[0]; //N.B. assumes RIRF has fixed timestep.
+	dataset.close();
+	delete[] temp;
+
+	// read B(w)
+	data_name = bodyName + "/hydro_coeffs/radiation_damping/all";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank3 = filespace.getSimpleExtentDims(radiation_damping_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspaceB(rank3, radiation_damping_dims);
+	// radiation_damping_dims[0] is number of rows, radiation_damping_dims[1] is number of columns, radiation_damping_dims[2] is number of matrices
+	radiation_damping_matrix = new double[radiation_damping_dims[0] * radiation_damping_dims[1] * radiation_damping_dims[2]];
+	// read file info into data_out, a 2d array
+	dataset.read(radiation_damping_matrix, H5::PredType::NATIVE_DOUBLE, mspaceB, filespace);
+	dataset.close();
+
+	// read excitation force coefficients - magnitude
+	data_name = bodyName + "/hydro_coeffs/excitation/mag";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank3 = filespace.getSimpleExtentDims(excitation_mag_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspaceExMag(rank3, excitation_mag_dims);
+	//// excitation_mag_dims[0] is number of rows, excitation_mag_dims[1] is number of columns, excitation_mag_dims[2] is number of matrices
+	excitation_mag_matrix = new double[excitation_mag_dims[0] * excitation_mag_dims[1] * excitation_mag_dims[2]];
+	//// read file info into data_out, a 2d array
+	dataset.read(excitation_mag_matrix, H5::PredType::NATIVE_DOUBLE, mspaceExMag, filespace);
+	dataset.close();
+
+	// read excitation force coefficients - phase
+	data_name = bodyName + "/hydro_coeffs/excitation/phase";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank3 = filespace.getSimpleExtentDims(excitation_phase_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspaceExPhase(rank3, excitation_phase_dims);
+	//// excitation_phase_dims[0] is number of rows, excitation_phase_dims[1] is number of columns, excitation_phase_dims[2] is number of matrices
+	excitation_phase_matrix = new double[excitation_phase_dims[0] * excitation_phase_dims[1] * excitation_phase_dims[2]];
+	//// read file info into data_out, a 2d array
+	dataset.read(excitation_phase_matrix, H5::PredType::NATIVE_DOUBLE, mspaceExPhase, filespace);
+	dataset.close();
+
+	// read excitation force coefficients - real
+	data_name = bodyName + "/hydro_coeffs/excitation/re";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank3 = filespace.getSimpleExtentDims(excitation_re_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspaceExRe(rank3, excitation_re_dims);
+	//// excitation_phase_dims[0] is number of rows, excitation_phase_dims[1] is number of columns, excitation_phase_dims[2] is number of matrices
+	excitation_re_matrix = new double[excitation_re_dims[0] * excitation_re_dims[1] * excitation_re_dims[2]];
+	//// read file info into data_out, a 2d array
+	dataset.read(excitation_re_matrix, H5::PredType::NATIVE_DOUBLE, mspaceExRe, filespace);
+	dataset.close();
+
+	// read excitation force coefficients - im
+	data_name = bodyName + "/hydro_coeffs/excitation/im";
+	dataset = sphereFile.openDataSet(data_name);
+	filespace = dataset.getSpace();
+	rank3 = filespace.getSimpleExtentDims(excitation_im_dims);
+	// read file into data_out 2d array
+	H5::DataSpace mspaceExIm(rank3, excitation_im_dims);
+	//// excitation_phase_dims[0] is number of rows, excitation_phase_dims[1] is number of columns, excitation_phase_dims[2] is number of matrices
+	excitation_im_matrix = new double[excitation_im_dims[0] * excitation_im_dims[1] * excitation_im_dims[2]];
+	//// read file info into data_out, a 2d array
+	dataset.read(excitation_im_matrix, H5::PredType::NATIVE_DOUBLE, mspaceExIm, filespace);
+	dataset.close();
+
+	sphereFile.close();
+}
+
+//H5FileInfo::H5FileInfo() {}
+
+H5FileInfo::~H5FileInfo() {
+	delete[] rirf_matrix;
+}
+
+/*******************************************************************************
+* H5FileInfo constructor
+* requires file name (in absolute file name or referenced from executable location)
+* and body name (name of body's section in H5 file, ie "body1" etc)
+* each body in system should have its own H5FileInfo object
+* calls readH5Data()
+*******************************************************************************/
+H5FileInfo::H5FileInfo(std::string file, std::string Name) {
+	h5_file_name = file;
+	bodyName = Name;
+	readH5Data();
+}
+
+/*******************************************************************************
+* H5FileInfo::GetHydrostaticStiffnessMatrix()
+* returns the linear restoring stiffness matrix
+*******************************************************************************/
+ChMatrixDynamic<double> H5FileInfo::GetHydrostaticStiffnessMatrix() const { //TODO cut this func
+	return lin_matrix;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetInfAddedMassMatrix()
+* returns the added mass matrix at infinite frequency
+*******************************************************************************/
+ChMatrixDynamic<double> H5FileInfo::GetInfiniteAddedMassMatrix() const {
+	return infinite_added_mass * rho;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetEquilibriumCoG()
+* returns cg, center of gravity of object's body
+*******************************************************************************/
+ChVector<> H5FileInfo::GetEquilibriumCoG() const { //TODO cut this func
+	return cg;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetEquilibriumCoB()
+* returns cb, the rotational equilibrium
+*******************************************************************************/
+ChVector<> H5FileInfo::GetEquilibriumCoB() const { //TODO cut this func
+	return cb;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRho()
+* returns the density of water, rho (kg/m^3 usually)
+*******************************************************************************/
+double H5FileInfo::GetRho() const { //TODO cut this func
+	return rho;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetGravity()
+* returns g, gravitational acceleration, m/s^2
+*******************************************************************************/
+double H5FileInfo::GetGravity() const { //TODO cut this func
+	return g;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetDisplacementVolume()
+* returns displaced volume when body at equilibrium, m^3
+*******************************************************************************/
+double H5FileInfo::GetDisplacementVolume() const { //TODO cut this func
+	return disp_vol;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRIRFval()
+* returns impulse response coeff for row m, column n, step s
+*******************************************************************************/
+double H5FileInfo::GetRIRFval(int m, int n, int s) const {
+	int index = s + rirf_dims[2] * (n + m * rirf_dims[1]);
+	if (index < 0 || index >= rirf_dims[0] * rirf_dims[1] * rirf_dims[2]) {
+		std::cout << "out of bounds IRF\n";
+		return 0;
+	}
+	else {
+		return rirf_matrix[index] * GetRho(); // scale radiation force by rho
+	}
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRIRFDims(int i) returns the i-th component of the dimensions of radiation_damping_matrix
+* i = [0,1,2] -> [number of rows, number of columns, number of matrices]
+*******************************************************************************/
+int H5FileInfo::GetRIRFDims(int i) const { //TODO cut this func????
+	return rirf_dims[i];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRIRFTimestep() returns the RIRF's timestep (dt)
+*******************************************************************************/
+double H5FileInfo::GetRIRFTimestep() const {
+	return rirf_timestep;
+}
+
+//TODO: Get B(w)
+
+/*******************************************************************************
+* H5FileInfo::GetNumFreqs()
+* returns number of frequencies computed
+*******************************************************************************/
+double H5FileInfo::GetNumFreqs() const { //TODO cut this func????
+	return freq_dims[0];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetOmegaMin()
+* returns min value of omega
+*******************************************************************************/
+double H5FileInfo::GetOmegaMin() const { //TODO cut this func????
+	return freq_list[0];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetOmegaMax()
+* returns max value of omega
+*******************************************************************************/
+double H5FileInfo::GetOmegaMax() const {
+	return freq_list[freq_dims[0] - 1];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetOmegaDelta()
+* returns omega step size
+*******************************************************************************/
+double H5FileInfo::GetOmegaDelta() const {
+	return GetOmegaMax() / GetNumFreqs();
+}
+
+/*******************************************************************************
+* H5FileInfo::GetExcitationMagValue()
+* returns excitation magnitudes for row i, column j, frequency ix k
+*******************************************************************************/
+double H5FileInfo::GetExcitationMagValue(int i, int j, int k) const {
+	int indexExMag = k + excitation_mag_dims[2] * i;
+	return excitation_mag_matrix[indexExMag] * rho * g;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetExcitationMagInterp()
+* returns excitation magnitudes for row i, column j, frequency ix k
+*******************************************************************************/
+double H5FileInfo::GetExcitationMagInterp(int i, int j, double freq_index_des) const {
+	double freq_interp_val = freq_index_des - floor(freq_index_des);
+	double excitationMagFloor = GetExcitationMagValue(i, j, floor(freq_index_des));
+	double excitationMagCeil = GetExcitationMagValue(i, j, floor(freq_index_des) + 1);
+	double excitationMag = (freq_interp_val * (excitationMagCeil - excitationMagFloor)) + excitationMagFloor;
+
+	return excitationMag;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetExcitationPhaseValue()
+* returns excitation phases for row i, column j, frequency k
+*******************************************************************************/
+double H5FileInfo::GetExcitationPhaseValue(int i, int j, int k) const {
+	int indexExPhase = k + excitation_phase_dims[2] * i;
+	return excitation_phase_matrix[indexExPhase];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetExcitationPhaseInterp()
+* returns excitation phases for row i, column j, frequency ix k
+*******************************************************************************/
+double H5FileInfo::GetExcitationPhaseInterp(int i, int j, double freq_index_des) const {
+	double freq_interp_val = freq_index_des - floor(freq_index_des);
+	double excitationPhaseFloor = GetExcitationPhaseValue(i, j, floor(freq_index_des));
+	double excitationPhaseCeil = GetExcitationPhaseValue(i, j, floor(freq_index_des) + 1);
+	double excitationPhase = (freq_interp_val * (excitationPhaseCeil - excitationPhaseFloor)) + excitationPhaseFloor;
+
+	return excitationPhase;
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRIRFdt() returns the difference in first 2 rirf_time_vector
+*******************************************************************************/
+double H5FileInfo::GetRIRFdt() const {
+	return rirf_time_vector[1] - rirf_time_vector[0];
+}
+
+/*******************************************************************************
+* H5FileInfo::GetRIRFTimeVector()
+* returns the std::vector of rirf_time_vector from h5 file
+*******************************************************************************/
+std::vector<double> H5FileInfo::GetRIRFTimeVector() const { //TODO cut this func
+	return rirf_time_vector;
+}
 
 // =============================================================================
 // HydroInputs Class Definitions
@@ -821,33 +1263,37 @@ double TestHydro::coordinateFunc(int b, int i) { // b_num from ForceFunc6d is 1 
 
 /*******************************************************************************
 * constructorHelper
-* for use in ChLoadAddedMass constructor, to convert a vector of shared_ptrs to 
+* for use in ChLoadAddedMass constructor, to convert a vector of shared_ptrs to
 * ChBody type objects to a vector of shared_ptrs to ChLoadable type objects
 * in order to use ChLoadCustomMultiple's constructor for a vector of ChLoadable
 * shared_ptrs
 *******************************************************************************/
 std::vector<std::shared_ptr<ChLoadable>> constructorHelper(std::vector<std::shared_ptr<ChBody>>& bodies) {
 	std::vector<std::shared_ptr<ChLoadable>> re(bodies.size());
-
 	std::transform(bodies.begin(), bodies.end(), re.begin(), [](const std::shared_ptr<ChBody>& p) { return std::static_pointer_cast<ChLoadable>(p); });
 
 	return re;
 }
 
+void ChLoadAddedMass::AssembleSystemAddedMassMat() {
+	for (int i = 0; i < nBodies; i++) {
+		infinite_added_mass = h5_body_data[i].GetInfiniteAddedMassMatrix();
+		//TODO: append multiple matrices
+	}
+}
 /*******************************************************************************
 * ChLoadAddedMass constructor
 * initializes body to have load applied to and added mass matrix from h5 file object
 *******************************************************************************/
 ChLoadAddedMass::ChLoadAddedMass(const std::vector<H5FileInfo>& user_h5_body_data,
-								 std::vector<std::shared_ptr<ChBody>>& bodies)
-								     : ChLoadCustomMultiple(constructorHelper(bodies)) { ///< calls ChLoadCustomMultiple to link loads to bodies
-	//infinite_added_mass = file.GetInfiniteAddedMassMatrix(); //TODO switch all uses of H5FileInfo object to be like this, instead of copying the object each time?
-	
+	std::vector<std::shared_ptr<ChBody>>& bodies)
+	: ChLoadCustomMultiple(constructorHelper(bodies)) { ///< calls ChLoadCustomMultiple to link loads to bodies
+//infinite_added_mass = file.GetInfiniteAddedMassMatrix(); //TODO switch all uses of H5FileInfo object to be like this, instead of copying the object each time?
 	nBodies = bodies.size();
 	h5_body_data = user_h5_body_data;
 	AssembleSystemAddedMassMat();
 
-	ChMatrixDynamic<double> massmat = h5_body_data[0].infinite_added_mass;
+	ChMatrixDynamic<double> massmat = infinite_added_mass;
 	std::ofstream myfile2;
 	myfile2.open("C:\\code\\HydroChrono_build\\Release\\debugging\\massmat1.txt");
 	myfile2 << massmat << "\n";
