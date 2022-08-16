@@ -36,32 +36,30 @@ H5FileInfo::H5FileInfo(std::string file, std::string Name) {
 *******************************************************************************/
 void H5FileInfo::readH5Data() { // TODO break up this function!
 	// open file with read only access
-	H5::H5File userH5File(h5_file_name, H5F_ACC_RDONLY);
+	H5::H5File sphereFile(h5_file_name, H5F_ACC_RDONLY);
 
-	InitScalar(userH5File, "simulation_parameters/rho", _rho);
-	InitScalar(userH5File, "simulation_parameters/g", _g);
-	InitScalar(userH5File, bodyName + "/properties/disp_vol", _disp_vol);
+	InitScalar(sphereFile, "simulation_parameters/rho", _rho);
+	InitScalar(sphereFile, "simulation_parameters/g", _g);
+	InitScalar(sphereFile, bodyName + "/properties/disp_vol", _disp_vol);
+	Init1D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
+	Init1D(sphereFile, bodyName + "/properties/cb", cb);
+	Init1D(sphereFile, bodyName + "/properties/cg", cg);
+	Init1D(sphereFile, "simulation_parameters/w", freq_list);
 
-	Init1D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
-	Init1D(userH5File, bodyName + "/properties/cb", cb);
-	Init1D(userH5File, bodyName + "/properties/cg", cg);
-	Init1D(userH5File, "simulation_parameters/w", freq_list);
+	Init2D(sphereFile, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
+	Init2D(sphereFile, bodyName + "/hydro_coeffs/added_mass/inf_freq", inf_added_mass);
 
-	Init2D(userH5File, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
-	Init2D(userH5File, bodyName + "/hydro_coeffs/added_mass/inf_freq", infinite_added_mass);
-
-	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
-	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
-	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims); 
-	Init3D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
-	Init3D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
-
+	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
+	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
+	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims);
+	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
+	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
 	// use same scalar function to set the int valued body number
 	double temp;
-	InitScalar(userH5File, bodyName + "/properties/body_number", temp);
+	InitScalar(sphereFile, bodyName + "/properties/body_number", temp);
 	bodyNum = (int)temp;
 
-	userH5File.close();
+	sphereFile.close();
 }
 
 /*******************************************************************************
@@ -173,10 +171,6 @@ void H5FileInfo::Init3D(H5::H5File& file, std::string data_name, std::vector<dou
 	for (int i = 0; i < dims[0] * dims[1] * dims[2]; i++) {
 		var[i] = temp[i];
 	}
-	for (int i = 0; i < dims[0] * dims[1] * dims[2]; i++) {
-		var[i] = temp[i];
-	}
-	rirf_timestep = rirf_time_vector[1] - rirf_time_vector[0]; //N.B. assumes RIRF has fixed timestep.
 	dataset.close();
 	delete[] temp;
 }
@@ -188,25 +182,24 @@ void H5FileInfo::Init3D(H5::H5File& file, std::string data_name, std::vector<dou
 H5FileInfo::~H5FileInfo() { }
 
 /*******************************************************************************
-* H5FileInfo::GetRIRFDims(int i) returns the i-th component of the dimensions of radiation_damping_matrix
-* i = [0,1,2] -> [number of rows, number of columns, number of matrices]
+* H5FileInfo::GetInfAddedMassMatrix()
+* returns the added mass matrix at infinite frequency
 *******************************************************************************/
-int H5FileInfo::GetRIRFDims(int i) const { 
-	return rirf_dims[i];
+ChMatrixDynamic<double> H5FileInfo::GetInfAddedMassMatrix() const {
+	return inf_added_mass * rho;
 }
 
 /*******************************************************************************
 * H5FileInfo::GetHydrostaticStiffness()
 * returns the linear restoring stiffness matrix element in row i , column j
 *******************************************************************************/
-double H5FileInfo::GetHydrostaticStiffness(int i, int j) const { 
+double H5FileInfo::GetHydrostaticStiffness(int i, int j) const {
 	return lin_matrix(i, j) * rho * g;
-	double double_disp_vol = 2 * disp_vol;
 }
 
 /*******************************************************************************
-* H5FileInfo::GetExcitationMagValue()
-* returns excitation magnitudes for row i, column j, frequency ix k
+* H5FileInfo::GetRIRFval()
+* returns impulse response coeff for row m, column n, step s
 *******************************************************************************/
 double H5FileInfo::GetRIRFval(int m, int n, int s) const {
 	int index = s + rirf_dims[2] * (n + m * rirf_dims[1]);
@@ -220,16 +213,18 @@ double H5FileInfo::GetRIRFval(int m, int n, int s) const {
 }
 
 /*******************************************************************************
-* H5FileInfo::GetExcitationMagInterp()
-* returns excitation magnitudes for row i, column j, frequency ix k
+* H5FileInfo::GetRIRFDims(int i) returns the i-th component of the dimensions of radiation_damping_matrix
+* i = [0,1,2] -> [number of rows, number of columns, number of matrices]
 *******************************************************************************/
-
+int H5FileInfo::GetRIRFDims(int i) const {
+	return rirf_dims[i];
+}
 
 /*******************************************************************************
 * H5FileInfo::GetRIRFTimeVector()
 * returns the std::vector of rirf_time_vector from h5 file
 *******************************************************************************/
-std::vector<double> H5FileInfo::GetRIRFTimeVector() const { 
+std::vector<double> H5FileInfo::GetRIRFTimeVector() const {
 	return rirf_time_vector;
 }
 
