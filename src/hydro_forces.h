@@ -30,14 +30,40 @@ using namespace chrono::fea;
 // =============================================================================
 class H5FileInfo { // TODO cut simple setter/getter functions to trim this huge class down
 public:
+	//H5FileInfo();
+	//H5FileInfo(std::string file, std::string body_name);
+	//void InitScalar(H5::H5File& file, std::string data_name, double& var);
+	//void Init1D(H5::H5File& file, std::string data_name, std::vector<double>& var);
+	//void Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic<double>& var); 
+	//void Init3D(H5::H5File& file, std::string data_name, std::vector<double>& var, std::vector<int>& dims);
+	//~H5FileInfo();
+	////ChMatrixDynamic<double> GetInfAddedMassMatrix() const;
+	//double GetHydrostaticStiffness(int i, int j) const;
+	//double GetRIRFval(int i, int n, int m) const;
+	//int GetRIRFDims(int i) const;
+	//std::vector<double> GetRIRFTimeVector() const; // TODO
+	////double GetExcitationMagValue(int m, int n, int w) const;
+	////double GetExcitationMagInterp(int i, int j, double freq_index_des) const;
+	////double GetExcitationPhaseValue(int m, int n, int w) const;
+	////double GetExcitationPhaseInterp(int i, int j, double freq_index_des) const;
+	////double GetNumFreqs() const;
+	//std::vector<double> cg;
+	//std::vector<double> cb;
+	//const double& rho = _rho;
+	//const double& g = _g;
+	////const double& disp_vol = _disp_vol;
+	//double disp_vol;
+	//int bodyNum;
+	//ChMatrixDynamic<double> infinite_added_mass;
 	H5FileInfo();
 	H5FileInfo(std::string file, std::string body_name);
 	void InitScalar(H5::H5File& file, std::string data_name, double& var);
 	void Init1D(H5::H5File& file, std::string data_name, std::vector<double>& var);
-	void Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic<double>& var); 
+	void Init2D(H5::H5File& file, std::string data_name, ChMatrixDynamic<double>& var);
 	void Init3D(H5::H5File& file, std::string data_name, std::vector<double>& var, std::vector<int>& dims);
 	~H5FileInfo();
-	ChMatrixDynamic<double> GetInfAddedMassMatrix() const;
+	//ChMatrixDynamic<double> GetInfAddedMassMatrix() const;
+	ChMatrixDynamic<double> infinite_added_mass;
 	double GetHydrostaticStiffness(int i, int j) const;
 	double GetRIRFval(int i, int n, int m) const;
 	int GetRIRFDims(int i) const;
@@ -54,12 +80,34 @@ public:
 	const double& disp_vol = _disp_vol;
 	int bodyNum;
 private:
+	//double _rho;
+	//double _g;
+	//double _disp_vol;
+	//std::vector<double> freq_list;
+	//ChMatrixDynamic<double> lin_matrix;
+	//std::vector<double> rirf_matrix;
+	//std::vector<int> rirf_dims;
+	//std::vector<double> rirf_time_vector;
+	double rirf_timestep;
+	//std::vector<double> radiation_damping_matrix; // TODO check about names
+	//std::vector<int> Bw_dims; // TODO check with dave on name for dimensions of radiation damping matrix
+	//std::vector<double> excitation_mag_matrix;
+	//std::vector<int> mag_dims;
+	//std::vector<double> excitation_re_matrix;
+	//std::vector<int> re_dims;
+	//std::vector<double> excitation_im_matrix;
+	//std::vector<int> im_dims;
+	////std::vector<double> excitation_phase_matrix;
+	////double omega_min;
+	////double omega_max;
+	//std::string h5_file_name;
+	//std::string bodyName;
+	//void readH5Data();
 	double _rho;
 	double _g;
 	double _disp_vol;
 	std::vector<double> freq_list;
 	ChMatrixDynamic<double> lin_matrix;
-	ChMatrixDynamic<double> inf_added_mass;
 	std::vector<double> rirf_matrix;
 	std::vector<int> rirf_dims;
 	std::vector<double> rirf_time_vector;
@@ -145,7 +193,7 @@ public:
 	TestHydro(const TestHydro& old) = delete;
 	TestHydro operator = (const TestHydro& rhs) = delete;
 	std::vector<double> ComputeForceHydrostatics();
-	std::vector<double> ComputeForceRadiationDampingConv();
+	std::vector<double> ComputeForceRadiationConvolution();
 	//std::vector<double> ComputeForceExcitation();
 	double GetRIRFval(int row, int col, int st);
 	double coordinateFunc(int b, int i);
@@ -154,6 +202,7 @@ private:
 	std::vector<std::shared_ptr<ChBody>> bodies;
 	std::vector<H5FileInfo> file_info;
 	std::vector<ForceFunc6d> force_per_body;
+	bool convolutionByTrapz = true; // by default, use trapezoidal integration method
 	double sumVelHistoryAndRIRF;
 	double rirf_timestep;
 	HydroInputs hydro_inputs;

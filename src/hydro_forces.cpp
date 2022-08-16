@@ -36,30 +36,32 @@ H5FileInfo::H5FileInfo(std::string file, std::string Name) {
 *******************************************************************************/
 void H5FileInfo::readH5Data() { // TODO break up this function!
 	// open file with read only access
-	H5::H5File sphereFile(h5_file_name, H5F_ACC_RDONLY);
+	H5::H5File userH5File(h5_file_name, H5F_ACC_RDONLY);
 
-	InitScalar(sphereFile, "simulation_parameters/rho", _rho);
-	InitScalar(sphereFile, "simulation_parameters/g", _g);
-	InitScalar(sphereFile, bodyName + "/properties/disp_vol", _disp_vol);
-	Init1D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
-	Init1D(sphereFile, bodyName + "/properties/cb", cb);
-	Init1D(sphereFile, bodyName + "/properties/cg", cg);
-	Init1D(sphereFile, "simulation_parameters/w", freq_list);
+	InitScalar(userH5File, "simulation_parameters/rho", _rho);
+	InitScalar(userH5File, "simulation_parameters/g", _g);
+	InitScalar(userH5File, bodyName + "/properties/disp_vol", _disp_vol);
 
-	Init2D(sphereFile, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
-	Init2D(sphereFile, bodyName + "/hydro_coeffs/added_mass/inf_freq", inf_added_mass);
+	Init1D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/t", rirf_time_vector);
+	Init1D(userH5File, bodyName + "/properties/cb", cb);
+	Init1D(userH5File, bodyName + "/properties/cg", cg);
+	Init1D(userH5File, "simulation_parameters/w", freq_list);
 
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims); 
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
-	Init3D(sphereFile, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
+	Init2D(userH5File, bodyName + "/hydro_coeffs/linear_restoring_stiffness", lin_matrix);
+	Init2D(userH5File, bodyName + "/hydro_coeffs/added_mass/inf_freq", infinite_added_mass);
+
+	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/mag", excitation_mag_matrix, mag_dims);
+	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/re", excitation_re_matrix, re_dims);
+	Init3D(userH5File, bodyName + "/hydro_coeffs/excitation/im", excitation_im_matrix, im_dims); 
+	Init3D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/impulse_response_fun/K", rirf_matrix, rirf_dims);
+	Init3D(userH5File, bodyName + "/hydro_coeffs/radiation_damping/all", radiation_damping_matrix, Bw_dims);
+
 	// use same scalar function to set the int valued body number
 	double temp;
-	InitScalar(sphereFile, bodyName + "/properties/body_number", temp);
+	InitScalar(userH5File, bodyName + "/properties/body_number", temp);
 	bodyNum = (int)temp;
 
-	sphereFile.close();
+	userH5File.close();
 }
 
 /*******************************************************************************
@@ -199,6 +201,7 @@ int H5FileInfo::GetRIRFDims(int i) const {
 *******************************************************************************/
 double H5FileInfo::GetHydrostaticStiffness(int i, int j) const { 
 	return lin_matrix(i, j) * rho * g;
+	double double_disp_vol = 2 * disp_vol;
 }
 
 /*******************************************************************************
@@ -220,9 +223,7 @@ double H5FileInfo::GetRIRFval(int m, int n, int s) const {
 * H5FileInfo::GetExcitationMagInterp()
 * returns excitation magnitudes for row i, column j, frequency ix k
 *******************************************************************************/
-int H5FileInfo::GetRIRFDims(int i) const { 
-	return rirf_dims[i];
-}
+
 
 /*******************************************************************************
 * H5FileInfo::GetRIRFTimeVector()
@@ -671,7 +672,7 @@ std::vector<double> TestHydro::ComputeForceHydrostatics() {
 		force_hydrostatic[3 + b_offset] += -1 * buoyancy[b] * cb_minus_cg[1]; // roll part of cross product simplified
 		force_hydrostatic[4 + b_offset] += buoyancy[b] * cb_minus_cg[0]; // pitch part of cross product simplified
 	}
-	delete[] buoyancy;
+	//delete[] buoyancy;
 	return force_hydrostatic;
 }
 
@@ -679,7 +680,7 @@ std::vector<double> TestHydro::ComputeForceHydrostatics() {
 * TestHydro::ComputeForceRadiationDampingConv()
 * computes the 6N dimensional Radiation Damping force with convolution history
 *******************************************************************************/
-std::vector<double> TestHydro::ComputeForceRadiationDampingConvolution() {
+std::vector<double> TestHydro::ComputeForceRadiationConvolution() {
 	int size = 0, numRows = 0, numCols = 0;
 	size = file_info[0].GetRIRFDims(2);
 	// "shift" everything left 1
@@ -710,7 +711,7 @@ std::vector<double> TestHydro::ComputeForceRadiationDampingConvolution() {
 	int vi;
 	std::fill(force_radiation_damping.begin(), force_radiation_damping.end(), 0);
 	//#pragma omp parallel for
-	if (convTrapz == true){
+	if (convolutionByTrapz == true){
 		// convolution integral using trapezoidal rule
 		for (int row = 0; row < numRows; row++) {
 			//#pragma omp parallel for
@@ -805,8 +806,8 @@ double TestHydro::coordinateFunc(int b, int i) { // b_num from ForceFunc6d is 1 
 	prev_time = bodies[0]->GetChTime();
 	// call all compute force functions
 	ComputeForceHydrostatics();
-	convTrapz = true; // use trapeziodal rule or assume fixed dt.
-	ComputeForceRadiationDampingConvolution();
+	convolutionByTrapz = true; // use trapeziodal rule or assume fixed dt.
+	ComputeForceRadiationConvolution();
 
 	// sum all forces element by element
 	unsigned total_dofs = 6 * num_bodies;
@@ -830,13 +831,13 @@ double TestHydro::coordinateFunc(int b, int i) { // b_num from ForceFunc6d is 1 
 * in order to use ChLoadCustomMultiple's constructor for a vector of ChLoadable
 * shared_ptrs
 *******************************************************************************/
-//std::vector<std::shared_ptr<ChLoadable>> constructorHelper(std::vector<std::shared_ptr<ChBody>>& bodies) {
-//	std::vector<std::shared_ptr<ChLoadable>> re(bodies.size());
-//
-//	std::transform(bodies.begin(), bodies.end(), re.begin(), [](const std::shared_ptr<ChBody>& p) { return std::static_pointer_cast<ChLoadable>(p); });
-//
-//	return re;
-//}
+std::vector<std::shared_ptr<ChLoadable>> constructorHelper(std::vector<std::shared_ptr<ChBody>>& bodies) {
+	std::vector<std::shared_ptr<ChLoadable>> re(bodies.size());
+
+	std::transform(bodies.begin(), bodies.end(), re.begin(), [](const std::shared_ptr<ChBody>& p) { return std::static_pointer_cast<ChLoadable>(p); });
+
+	return re;
+}
 
 /*******************************************************************************
 * ChLoadAddedMass constructor
@@ -846,11 +847,12 @@ ChLoadAddedMass::ChLoadAddedMass(const std::vector<H5FileInfo>& user_h5_body_dat
 								 std::vector<std::shared_ptr<ChBody>>& bodies)
 								     : ChLoadCustomMultiple(constructorHelper(bodies)) { ///< calls ChLoadCustomMultiple to link loads to bodies
 	//infinite_added_mass = file.GetInfiniteAddedMassMatrix(); //TODO switch all uses of H5FileInfo object to be like this, instead of copying the object each time?
+	
 	nBodies = bodies.size();
 	h5_body_data = user_h5_body_data;
 	AssembleSystemAddedMassMat();
 
-	ChMatrixDynamic<double> massmat = infinite_added_mass;
+	ChMatrixDynamic<double> massmat = h5_body_data[0].infinite_added_mass;
 	std::ofstream myfile2;
 	myfile2.open("C:\\code\\HydroChrono_build\\Release\\debugging\\massmat1.txt");
 	myfile2 << massmat << "\n";
