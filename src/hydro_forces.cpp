@@ -807,10 +807,10 @@ std::vector<double> TestHydro::ComputeForceHydrostatics() {
 	// add vertical buoyancy for each body, and add (0,0,buoyancy)x(cb-cg) to torque for each body (simplified)
 	for (int b = 0; b < num_bodies; b++) {
 		buoyancy[b] = 1000.0 * 9.81 * file_info[b].disp_vol; // buoyancy = rho*g*Vdisp
-		weight[b] = (bodies[b]->GetMass() * 9.81);
+		//weight[b] = (bodies[b]->GetMass() * 9.81);
 		unsigned b_offset = 6 * b;
 		force_hydrostatic[2 + b_offset] += buoyancy[b];// -weight[b];////buoyancy[b];// ; // add regular z direction buoyancy force
-		force_hydrostatic[2 + b_offset] -= weight[b];
+		//force_hydrostatic[2 + b_offset] -= weight[b];
 		//force_hydrostatic[3 + b_offset] += -1 * buoyancy[b] * cb_minus_cg[1]; // roll part of cross product simplified
 		//force_hydrostatic[4 + b_offset] += buoyancy[b] * cb_minus_cg[0]; // pitch part of cross product simplified
 	}
