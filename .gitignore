@@ -1,3 +1,8 @@
 .vs
 build
 data
+sandbox
+.editorconfig
+launch.json
+settings.json
+c_cpp_properties.json
