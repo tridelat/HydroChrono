@@ -17,9 +17,12 @@ project(HydroChrono
 	LANGUAGES CXX
 )
 
+# Add the cmake folder so the FindSphinx module is found
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 option (HYDRO_CHRONO_ENABLE_TESTS "Enable tests" ON)
-
+option (HYDRO_CHRONO_ENABLE_USER_DOC "User's documentation" ON)
+option (HYDRO_CHRONO_ENABLE_PROG_DOC "Programmer's documentation" ON)
 
 # find required packages and libraries to make HydroChrono library
 set (LIB_TYPE STATIC) # or SHARED
@@ -183,6 +186,11 @@ if(HYDRO_CHRONO_ENABLE_TESTS)
 
 endif(HYDRO_CHRONO_ENABLE_TESTS)
 
+
+# ================
+# Documentation
+# ================
+add_subdirectory(doc)
 
 #--------------------------------------------------------------
 # === 4 (OPTIONAL) ===
