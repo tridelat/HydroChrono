@@ -15,12 +15,14 @@
 ChLoadAddedMass::ChLoadAddedMass(const std::vector<H5FileInfo>& user_h5_body_data,
                                  std::vector<std::shared_ptr<ChLoadable>>& bodies)
     : ChLoadCustomMultiple(bodies) {
-	nBodies = bodies.size();
-
+	auto nBodies = bodies.size();
 	infinite_added_mass.setZero(6 * nBodies, 6 * nBodies);
 	for (int i = 0; i < nBodies; i++) {
 		infinite_added_mass.block(i * 6, 0, 6, nBodies * 6) = user_h5_body_data[i].GetInfAddedMassMatrix();
 	}
+
+	// initialize added mass matrix for whole system
+	infinite_added_mass_system = infinite_added_mass;
 }
 
 /*******************************************************************************
@@ -34,8 +36,21 @@ void ChLoadAddedMass::ComputeJacobian(ChState* state_x,       ///< state positio
                                       ChMatrixRef mR,         ///< result dQ/dv
                                       ChMatrixRef mM          ///< result dQ/da
 ) {
+	// The following ensures that the added mass matrix matches the size of the ChSystem mass matrix. It is necessary
+	// for systems that have both hydro and non-hydro bodies when adding a system-wide load.
+	// @todo if possible, remove hack by using initialiazer function called AFTER the ChSystem is assembled.
+	// get mass matrix size
+	auto mmrows = jacobians->M.rows();
+	// check if ChSystem mass matrix size different from added mass matrix size
+	if (mmrows != infinite_added_mass_system.rows() && mmrows > 0) {
+		auto amrows = infinite_added_mass.rows();
+		// initialize/update system matrix;
+		infinite_added_mass_system.setZero(mmrows, mmrows);
+		infinite_added_mass_system.block(0, 0, amrows, amrows) = infinite_added_mass;
+	}
+
 	// set mass matrix here
-	jacobians->M = infinite_added_mass;
+	jacobians->M = infinite_added_mass_system;
 
 	// R gyroscopic damping matrix terms (6Nx6N)
 	// 0 for added mass
