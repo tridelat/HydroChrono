@@ -117,6 +117,22 @@ int main(int argc, char* argv[]) {
     sphereBody->SetPos(ChVector<>(0, 0, -1));
     sphereBody->SetMass(261.8e3);
 
+    // set up body from a mesh
+    std::cout << "Attempting to open mesh file: " << body1_meshfame << std::endl;
+    std::shared_ptr<ChBody> sphereBody2 = chrono_types::make_shared<ChBodyEasyMesh>(  //
+        body1_meshfame,                                                              // file name
+        1000,                                                                        // density
+        false,  // do not evaluate mass automatically
+        true,   // create visualization asset
+        false   // do not collide
+    );
+
+    // define the body's initial conditions
+    system.Add(sphereBody2);
+    // sphereBody2->SetNameString("body1");  // must set body name correctly! (must match .h5 file)
+    sphereBody2->SetPos(ChVector<>(10, 10, -1));
+    sphereBody2->SetMass(261.8e3);
+
     // define wave parameters (not used in this demo)
     // Todo define a way to use TestHydro without hydro_inputs/waves
     HydroInputs my_hydro_inputs;
