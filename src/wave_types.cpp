@@ -7,6 +7,14 @@
 #include <hydroc/wave_types.h>
 #include <unsupported/Eigen/Splines>
 
+bool is_in_deep_water(double wavenumber, double water_depth) {
+    if (wavenumber * water_depth > 89.4) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 double GetEta(const Eigen::Vector3d& position,
               double time,
               double omega,
@@ -69,7 +77,7 @@ Eigen::Vector3d GetWaterVelocity(const Eigen::Vector3d& position,
 
     // get water velocity
     auto water_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
-    if (2 * M_PI / wavenumber > water_depth || wavenumber * water_depth > 500.0) {
+    if (is_in_deep_water(wavenumber, water_depth)) {
         // deep water
         water_velocity[0] =
             omega * amplitude * std::exp(wavenumber * z_pos) * cos(wavenumber * x_pos - omega * time + phase);
@@ -101,7 +109,7 @@ Eigen::Vector3d GetWaterAcceleration(const Eigen::Vector3d& position,
 
     // get water velocity
     auto water_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
-    if (2 * M_PI / wavenumber > water_depth || wavenumber * water_depth > 500.0) {
+    if (is_in_deep_water(wavenumber, water_depth)) {
         // deep water
         water_acceleration[0] =
             omega * omega * amplitude * std::exp(wavenumber * z_pos) * sin(wavenumber * x_pos - omega * time + phase);
