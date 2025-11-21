@@ -19,6 +19,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 // Version information - these may be provided by the build system
 #ifndef HYDROCHRONO_VERSION
